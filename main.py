@@ -20,8 +20,8 @@ args = vars(parser.parse_args())
 
 
 def main():
-    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "traffic.flv"))
-    camera = cv2.VideoCapture(path.join(path.dirname(__file__), "768x576.avi"))
+    camera = cv2.VideoCapture(path.join(path.dirname(__file__), "traffic.flv"))
+    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "768x576.avi"))
     # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "..", "movie.mpg"))
     # camera = cv2.VideoCapture(0)
     history = 20
