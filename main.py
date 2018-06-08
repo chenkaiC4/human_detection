@@ -19,7 +19,6 @@ parser.add_argument("-a", "--algorithm",
 args = vars(parser.parse_args())
 
 
-
 def main():
     # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "traffic.flv"))
     camera = cv2.VideoCapture(path.join(path.dirname(__file__), "768x576.avi"))
@@ -43,12 +42,11 @@ def main():
     out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
     while True:
         print(" -------------------- FRAME %d --------------------" % frames)
-        grabbed, frane = camera.read()
+        grabbed, frame = camera.read()
         if (grabbed is False):
             print("failed to grab frame.")
             break
 
-        ret, frame = camera.read()
         fgmask = bs.apply(frame)
 
         # this is just to let the background subtractor build a bit of history
@@ -61,7 +59,6 @@ def main():
         dilated = cv2.dilate(th, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8, 3)), iterations=2)
         image, contours, hier = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        counter = 0
         for c in contours:
             (x, y, w, h) = cv2.boundingRect(c)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)

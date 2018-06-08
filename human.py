@@ -6,6 +6,7 @@ from tool import center
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
+
 class Human():
     """human class
 

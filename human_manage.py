@@ -6,7 +6,7 @@ from human import Human
 from tool import center, distance
 
 min_contour_area = 500
-threshold_distance = 150
+threshold_distance = 400
 
 
 class HumanManager():
@@ -26,14 +26,18 @@ class HumanManager():
         # 遍历计算中心店距离
         distances = []
         for _id, human in self.humans.items():
-            p = (_id, distance(human.predictCenter, _center))
+            _distance = distance(human.predictCenter, _center)
+            print("distance is %f" % _distance)
+            p = (_id, _distance)
             distances.append(p)
 
         # 排序
         sorted(distances, key=lambda d: d[1])
 
         # 筛选 < threshold_distance
-        filter(lambda d: d[1] < threshold_distance, distances)
+        # filter(lambda d: d[1] < threshold_distance, distances)
+        distances = [elem for elem in distances if elem[1] < threshold_distance]
+        print(distances)
 
         if len(distances) > 0:
             _id = distances[0][0]
@@ -42,8 +46,11 @@ class HumanManager():
 
             # 更新
             match_human.kalman.correct(_center)
+
+            print("一共有 %d 符合的对象，match 对象id: %d" % (len(distances), _id))
             return False, match_human, _distance
 
+        print("检测到新的对象")
         return True, None, -1
 
     def get_next_id(self):
@@ -56,7 +63,7 @@ class HumanManager():
             return
 
         # 判断是否是新的 human
-        is_true, _ = self.is_new_object(contour)
+        is_true, _, _ = self.is_new_object(contour)
         if is_true:
             # 添加新的 human
             (x, y, w, h) = cv2.boundingRect(contour)
