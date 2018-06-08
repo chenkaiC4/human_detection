@@ -2,11 +2,9 @@
 
 import cv2
 
+from config import min_contour_area, threshold_distance
 from human import Human
 from tool import center, distance
-
-min_contour_area = 500
-threshold_distance = 400
 
 
 class HumanManager():

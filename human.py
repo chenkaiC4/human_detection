@@ -60,11 +60,16 @@ class Human():
 
         # 以下两个 if 中的代码主要用于跟踪物体，计算当前 center
         # 采用 CamShift
-        ret, self.track_window = cv2.CamShift(back_project, self.track_window, self.term_crit)
-        pts = cv2.boxPoints(ret)
-        pts = np.int0(pts)
-        self.center = center(pts)
-        cv2.polylines(frame, [pts], True, 255, 1)
+        # ret, self.track_window = cv2.CamShift(back_project, self.track_window, self.term_crit)
+        # pts = cv2.boxPoints(ret)
+        # pts = np.int0(pts)
+        # self.center = center(pts)
+        # cv2.polylines(frame, [pts], True, 255, 1)
+
+        ret, self.track_window = cv2.meanShift(back_project, self.track_window, self.term_crit)
+        x, y, w, h = self.track_window
+        self.center = center([[x, y], [x + w, y], [x, y + h], [x + w, y + h]])
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
 
         # if args.get("algorithm") == "c":
         #     ret, self.track_window = cv2.CamShift(back_project, self.track_window, self.term_crit)
