@@ -11,6 +11,7 @@ import os.path as path
 
 import cv2
 
+from config import background_frame
 from human_manage import HumanManager
 
 parser = argparse.ArgumentParser()
@@ -24,7 +25,6 @@ def main():
     # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "768x576.avi"))
     # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "..", "movie.mpg"))
     # camera = cv2.VideoCapture(0)
-    history = 20
     # KNN background subtractor
     bs = cv2.createBackgroundSubtractorKNN()
 
@@ -50,7 +50,7 @@ def main():
         fgmask = bs.apply(frame)
 
         # this is just to let the background subtractor build a bit of history
-        if frames < history:
+        if frames < background_frame:
             frames += 1
             continue
 
