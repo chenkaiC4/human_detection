@@ -21,8 +21,8 @@ args = vars(parser.parse_args())
 
 
 def main():
-    camera = cv2.VideoCapture(path.join(path.dirname(__file__), "traffic.flv"))
-    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "768x576.avi"))
+    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "traffic.flv"))
+    camera = cv2.VideoCapture(path.join(path.dirname(__file__), "human.avi"))
     # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "..", "movie.mpg"))
     # camera = cv2.VideoCapture(0)
     # KNN background subtractor
@@ -61,6 +61,7 @@ def main():
 
         for c in contours:
             (x, y, w, h) = cv2.boundingRect(c)
+            # 绘制检测到的 contour，绿色
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
 
             human_manager.add_human(frame, c)

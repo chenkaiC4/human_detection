@@ -69,7 +69,8 @@ class Human():
         x, y, w, h = self.track_window
         self.center = center([[x, y], [x + w, y], [x, y + h], [x + w, y + h]])
         self.centers.append(self.center)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
+        # 绘制跟踪的框，红色
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 1)
 
         # if args.get("algorithm") == "c":
         #     ret, self.track_window = cv2.CamShift(back_project, self.track_window, self.term_crit)
@@ -90,8 +91,8 @@ class Human():
         prediction = self.kalman.predict()
         self.predictCenter = prediction
 
-        # 绘制预测的 center
-        cv2.circle(frame, (int(prediction[0]), int(prediction[1])), 4, (255, 0, 0), -1)
+        # 绘制预测的 center，红色
+        cv2.circle(frame, (int(prediction[0]), int(prediction[1])), 2, (0, 0, 255), -1)
 
         # fake shadow
         cv2.putText(frame, "ID: %d -> %s" % (self.id, self.center), (11, (self.id + 1) * 25 + 1),

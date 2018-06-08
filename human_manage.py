@@ -14,6 +14,7 @@ class HumanManager():
     """
 
     def __init__(self):
+        self.num = 0
         self.humans = {}
 
     def is_new_object(self, contour):
@@ -24,8 +25,7 @@ class HumanManager():
         # 遍历计算中心店距离
         distances = []
         for _id, human in self.humans.items():
-            _distance = distance(human.predictCenter, _center)
-            print("distance is %f" % _distance)
+            _distance = distance(human.center, _center)
             p = (_id, _distance)
             distances.append(p)
 
@@ -33,7 +33,6 @@ class HumanManager():
         sorted(distances, key=lambda d: d[1])
 
         # 筛选 < threshold_distance
-        # filter(lambda d: d[1] < threshold_distance, distances)
         distances = [elem for elem in distances if elem[1] < threshold_distance]
         print(distances)
 
@@ -53,7 +52,8 @@ class HumanManager():
 
     def get_next_id(self):
         """获取一个 human id"""
-        return len(self.humans) + 1
+        self.num += 1
+        return self.num
 
     def add_human(self, frame, contour):
         """尝试添加 human"""
@@ -72,3 +72,15 @@ class HumanManager():
         """更新当前 frame"""
         for _id, human in self.humans.items():
             human.update(frame)
+
+        # 删除静止的物体或者错误的物体
+        _del_ids = []
+        for _id, human in self.humans.items():
+            l = len(human.centers)
+            if l > 5:
+                # 前后帧错误
+                if distance(human.centers[l - 5], human.centers[l - 1]) < 15:
+                    _del_ids.append(_id)
+
+        for _id in _del_ids:
+            del self.humans[_id]
