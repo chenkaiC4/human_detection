@@ -24,6 +24,7 @@ class Human():
 
         # 设置中心点
         self.center = None
+        self.centers = []
         self.predictCenter = None  # 卡尔曼预测的中心点
 
         # 设置起始 检查点 和 预测点
@@ -53,8 +54,6 @@ class Human():
         print("人物 %d 被清除" % self.id)
 
     def update(self, frame):
-        print("人物 %d 进行 update" % self.id)
-
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         back_project = cv2.calcBackProject([hsv], [0], self.roi_hist, [0, 180], 1)
 
@@ -69,6 +68,7 @@ class Human():
         ret, self.track_window = cv2.meanShift(back_project, self.track_window, self.term_crit)
         x, y, w, h = self.track_window
         self.center = center([[x, y], [x + w, y], [x, y + h], [x + w, y + h]])
+        self.centers.append(self.center)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
 
         # if args.get("algorithm") == "c":
