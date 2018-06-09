@@ -53,6 +53,15 @@ class Human():
     def __del__(self):
         print("人物 %d 被清除" % self.id)
 
+    def update_roi_hist(self, frame, track_window):
+        # 设置 roi
+        x, y, w, h = track_window
+        self.roi = cv2.cvtColor(frame[y:y + h, x:x + w], cv2.COLOR_BGR2HSV)
+
+        # 计算 roi 的 hist 直方图，并归一化
+        roi_hist = cv2.calcHist([self.roi], [0], None, [16], [0, 180])
+        self.roi_hist = cv2.normalize(roi_hist, roi_hist, 0, 255, cv2.NORM_MINMAX)
+
     def update(self, frame):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         back_project = cv2.calcBackProject([hsv], [0], self.roi_hist, [0, 180], 1)
@@ -92,7 +101,7 @@ class Human():
         self.predictCenter = prediction
 
         # 绘制预测的 center，红色
-        cv2.circle(frame, (int(prediction[0]), int(prediction[1])), 2, (0, 0, 255), -1)
+        cv2.circle(frame, (int(prediction[0]), int(prediction[1])), 3, (0, 0, 255), -1)
 
         # fake shadow
         cv2.putText(frame, "ID: %d -> %s" % (self.id, self.center), (11, (self.id + 1) * 25 + 1),

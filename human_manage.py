@@ -17,7 +17,7 @@ class HumanManager():
         self.num = 0
         self.humans = {}
 
-    def is_new_object(self, contour):
+    def is_new_object(self, frame, contour):
         """判断是否为最新 object[human]"""
         (x, y, w, h) = cv2.boundingRect(contour)
         _center = center([[x, y], [x + w, y], [x, y + h], [x + w, y + h]])
@@ -44,8 +44,8 @@ class HumanManager():
             match_human = self.humans[_id]
             _distance = distances[0][1]
 
-            # 更新
-            match_human.kalman.correct(_center)
+            # 更新 roi hist
+            match_human.update_roi_hist(frame, (x, y, w, h))
 
             print("一共有 %d 符合的对象，match 对象id: %d" % (len(distances), _id))
             return False, match_human, _distance
@@ -61,7 +61,7 @@ class HumanManager():
     def add_human(self, frame, contour):
         """尝试添加 human"""
         # 判断是否是新的 human
-        is_true, _, _ = self.is_new_object(contour)
+        is_true, _, _ = self.is_new_object(frame, contour)
         if is_true:
             # 添加新的 human
             (x, y, w, h) = cv2.boundingRect(contour)
@@ -79,7 +79,7 @@ class HumanManager():
             l = len(human.centers)
             if l > 5:
                 # 前后帧错误
-                if distance(human.centers[l - 5], human.centers[l - 1]) < 15:
+                if distance(human.centers[l - 3], human.centers[l - 1]) < 1:
                     _del_ids.append(_id)
 
         for _id in _del_ids:
