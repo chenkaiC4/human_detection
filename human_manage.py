@@ -30,10 +30,14 @@ class HumanManager():
             distances.append(p)
 
         # 排序
-        sorted(distances, key=lambda d: d[1])
+        distances = sorted(distances, key=lambda d: d[1])
+        print("距离排序：\n")
+        print(*distances, sep=", ")
 
         # 筛选 < threshold_distance
         distances = [elem for elem in distances if elem[1] < threshold_distance]
+        print("筛选后：\n")
+        print(' '.join(map(str, distances)))
 
         if len(distances) > 0:
             _id = distances[0][0]

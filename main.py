@@ -7,7 +7,6 @@ and tracks pedestrians in the video.
 """
 
 import argparse
-import os.path as path
 
 import cv2
 
@@ -22,9 +21,9 @@ args = vars(parser.parse_args())
 
 def main():
     # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "traffic.flv"))
-    camera = cv2.VideoCapture(path.join(path.dirname(__file__), "human.avi"))
+    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "human.avi"))
     # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "..", "movie.mpg"))
-    # camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(0)
     # KNN background subtractor
     bs = cv2.createBackgroundSubtractorKNN()
 
