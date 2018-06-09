@@ -11,7 +11,7 @@ import os.path as path
 
 import cv2
 
-from config import background_frame
+from config import background_frame, min_contour_area
 from human_manage import HumanManager
 
 parser = argparse.ArgumentParser()
@@ -62,8 +62,10 @@ def main():
         for c in contours:
             (x, y, w, h) = cv2.boundingRect(c)
             # 绘制检测到的 contour，绿色
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
+            if cv2.contourArea(c) < min_contour_area:
+                continue
 
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             human_manager.add_human(frame, c)
 
         human_manager.update(frame)

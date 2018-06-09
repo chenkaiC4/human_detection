@@ -2,7 +2,7 @@
 
 import cv2
 
-from config import min_contour_area, threshold_distance
+from config import threshold_distance
 from human import Human
 from tool import center, distance
 
@@ -34,7 +34,6 @@ class HumanManager():
 
         # 筛选 < threshold_distance
         distances = [elem for elem in distances if elem[1] < threshold_distance]
-        print(distances)
 
         if len(distances) > 0:
             _id = distances[0][0]
@@ -57,9 +56,6 @@ class HumanManager():
 
     def add_human(self, frame, contour):
         """尝试添加 human"""
-        if cv2.contourArea(contour) < min_contour_area:
-            return
-
         # 判断是否是新的 human
         is_true, _, _ = self.is_new_object(contour)
         if is_true:
