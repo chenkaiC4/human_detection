@@ -6,40 +6,39 @@ The application opens a video (could be a camera or a video file)
 and tracks pedestrians in the video.
 """
 
-import argparse
 from os import path
 
 import cv2
 
 from config import background_frame, min_contour_area
-from human_manage import HumanManager
+from detected_obj import DetectedObject
+from manage import Manager
+from tool import is_inside
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--algorithm",
-                    help="m (or nothing) for meanShift and c for camshift")
-args = vars(parser.parse_args())
+
+def draw_person(image, person):
+    x, y, w, h = cv2.boundingRect(person)
+    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 255), 2)
 
 
 def main():
-    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "traffic.flv"))
-    camera = cv2.VideoCapture(path.join(path.dirname(__file__), "human.avi"))
-    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "..", "movie.mpg"))
+    camera = cv2.VideoCapture(path.join(path.dirname(__file__), "samples/traffic.flv"))
+    # camera = cv2.VideoCapture(path.join(path.dirname(__file__), "samples/human.avi"))
     # camera = cv2.VideoCapture(0)
     # KNN background subtractor
     bs = cv2.createBackgroundSubtractorKNN()
 
     # MOG subtractor
-    # bs = cv2.bgsegm.createBackgroundSubtractorMOG(history = history)
+    # bs = cv2.bgsegm.createBackgroundSubtractorMOG(history = background_frame)
     # bs.setHistory(history)
 
     # GMG
     # bs = cv2.bgsegm.createBackgroundSubtractorGMG(initializationFrames = history)
 
-    cv2.namedWindow("surveillance")
-    human_manager = HumanManager()
+    cv2.namedWindow("视窗")
+    human_manager = Manager()
     frames = 0
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
+
     while True:
         print(" -------------------- FRAME %d --------------------" % frames)
         grabbed, frame = camera.read()
@@ -54,33 +53,35 @@ def main():
             frames += 1
             continue
 
-        # if frames < background_frame+120:
-        #     frames += 1
-        #     continue
-
         th = cv2.threshold(fgmask.copy(), 127, 255, cv2.THRESH_BINARY)[1]
         th = cv2.erode(th, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)), iterations=2)
         dilated = cv2.dilate(th, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8, 3)), iterations=2)
-        image, contours, hier = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        image, contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        for c in contours:
-            (x, y, w, h) = cv2.boundingRect(c)
-            # 绘制检测到的 contour，绿色
-            if cv2.contourArea(c) < min_contour_area:
-                continue
+        # 遍历两遍，过滤内置小框
+        found_filtered = []
+        for ridx, o in enumerate(contours):
+            for qidx, i in enumerate(contours):
+                # i 在 o 内
+                if ridx != qidx and is_inside(cv2.boundingRect(o), cv2.boundingRect(i)):
+                    break
+                else:
+                    found_filtered.append(i)
 
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            human_manager.add_human(frame, c)
+        detected_objects = []
+        for contour in found_filtered:
+            if cv2.contourArea(contour) > min_contour_area:
+                draw_person(frame, contour)
+                track_window = cv2.boundingRect(contour)
+                detected_objects.append(DetectedObject(track_window))
 
-        human_manager.update(frame)
+        human_manager.process_detect_objs(detected_objects)
 
         frames += 1
 
         cv2.imshow("surveillance", frame)
-        out.write(frame)
         if cv2.waitKey(110) & 0xff == 27:
             break
-    out.release()
     camera.release()
 
 

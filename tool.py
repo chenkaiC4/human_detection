@@ -12,3 +12,10 @@ def center(points):
 def distance(p1, p2):
     """calculates distance of two point"""
     return ((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
+
+
+def is_inside(o, i):
+    """判断 i 是否在 o 内"""
+    ox, oy, ow, oh = o
+    ix, iy, iw, ih = i
+    return ox > ix and oy > iy and ox + ow < ix + iw and oy + oh < iy + ih

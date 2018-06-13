@@ -3,3 +3,5 @@ output.avi
 *.flv
 *.idea
 __pycache__/
+
+/demo
