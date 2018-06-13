@@ -47,6 +47,8 @@ class Manager:
         # 筛选出未被加入任何跟踪物体的 detect_object
         # TODO 逻辑 创建 TrackedObject，或者 丢弃
         un_tracked_object = [obj for obj in objs if obj.is_matched() is False]
+        print(len(un_tracked_object))
 
         for obj in un_tracked_object:
+            print("加入新的 track_object")
             self.humans.append(TrackedObject(obj))

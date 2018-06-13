@@ -26,7 +26,7 @@ class DetectedObject:
         (x, y, w, h) = track_window
         self._center = center([[x, y], [x + w, y], [x, y + h], [x + w, y + h]])
         self._track_window = track_window
-        # TODO 判断 is_come & is_out
+        # TODO 360 这个数应该是在第一帧时，画上去，或者根据屏幕大小自动设置
         if x > 360:
             self._in_zoom_far_door = True
         else:

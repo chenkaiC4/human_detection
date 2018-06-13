@@ -48,14 +48,9 @@ class TrackedObject():
         self._current_center = detected_obj.get_center()
         self._centers.append(self._current_center)
 
-        # 标记为进入
-        if self._last_detect_object is not None:
-            if detected_obj.is_far_door() & self._last_detect_object.is_near_door():
-                self._mark_in = True
-
     def is_mark_in(self) -> bool:
         """判断是否进入门店"""
-        return self._mark_in
+        return self._current_detect_object.is_far_door() & self._last_detect_object.is_near_door()
 
     def distance_to(self, p) -> float:
         """计算质心和 p 的距离
@@ -69,8 +64,17 @@ class TrackedObject():
         :param objs detected objects
         :return bool, List[DetectedObject]
         """
-        filter_objs = [(obj, obj.distance_to(self._current_center)) for obj in objs if
-                       obj.distance_to(self._current_center) < threshold_distance]
+
+        filter_objs = []
+        for obj in objs:
+            dis = obj.distance_to(self._current_center)
+            print("距离 %f" % dis)
+            if dis < threshold_distance:
+                filter_objs.append((obj, dis))
+
+        # list compresh 调试不方便
+        # filter_objs = [(obj, obj.distance_to(self._current_center)) for obj in objs if
+        #                obj.distance_to(self._current_center) < threshold_distance]
 
         if len(filter_objs) == 0:
             return False, []
